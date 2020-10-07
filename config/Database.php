@@ -1,11 +1,19 @@
 <?php
 //class Database
 class Database {
-    //database settings 
+    /*database settings localhost 
     private $host = 'localhost';
     private $db_name = 'moment5';
     private $username = 'moment5';
     private $password = 'moment5password';
+    private $conn;
+    */
+
+    //database settings miun.se 
+    private $host = 'studentmysql.miun.se';
+    private $db_name = 'saan1906';
+    private $username = 'saan1906';
+    private $password = '97xgd5u6';
     private $conn;
 
     //connect to database

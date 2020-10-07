@@ -1,94 +1,92 @@
 <?php
 
-//hämta filer
+//require files
 require 'config/Database.php';
 require 'classes/Courses.php';
 
-//Inställningar med headers- webbtjänsten tillgänglig från alla domäner
-header('Content-Type:application/json; charset=UTF-8'); //json format förväntas att hämtas
-header('Access-Control-Allow-Origin: *'); //kommer åt webbtjänsten från alla domäner
-header('Access-Control-Allow-Methods: POST, GET, DELETE, PUT'); //tillåter dessa metoder
-header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With'); //tillåter att headers används
+// Settings for headers 
+header('Content-Type: application/json;'); //json data
+header('Access-Control-Allow-Origin: *'); //reach from every domain 
+header('Access-Control-Allow-Methods: POST, GET, DELETE, PUT'); //allow metods
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Access-Control-Allow-Origin, Authorization, X-Requested-With'); //allow headers 
 
-//tar in metod som är inhämtad vid anropet och lagra i variabel
+//Store requested method in a variable 
 $method = $_SERVER['REQUEST_METHOD'];
 
-//om id finns i url:en, skapar i variabel "id"
+//Create variable "id" if there is any id
 if(isset($_GET['id'])) {
     $id = $_GET['id'];
 }
 
-//skapa ny klass av databasen och koppla till den
+//Create Database object and connect
 $database = new Database();
 $db = $database->connect();
 
-//skapa en instans av klassen för att skicka SQL frågor till
-//skickar med databas-anslutning som parameter
+//Create an instance of the class "Courses" and send the db connection as a parameter 
 $courses = new Courses($db);
 
-//swish-sats som kollar vilken metod som är inskickad
+//swish that us the encloses method
 switch($method) {
+    //GET
     case 'GET':
         if(isset($id)) {
-            //kör denna om det finns ett specifikt angivet id
+            //if there is an id, get specific course
             $result =$courses->getOne($id);
         } else {
-            //kör denna om hela tabellen ska läsas
+            //to get all courses
             $result = $courses->getAll();
         }
-        //kontollerar så att resultatet innehåller några rader
+        //chech if result contain any data
         if(sizeof($result) > 0) {
-            http_response_code(200); //OK resultat
+            http_response_code(200); //OK 
         } else {
-            http_response_code(404); //hittar ej data
-            $result = array("message" => "Hittade tyvärr inga kurser");
+            http_response_code(404); //can´t find data
+            $result = array("message" => "Hittade inga kurser");
         }
         break;
         //POST
     case 'POST':
-        //läser in data som är inskickad och gör till php objekt
+        //read submitted data and make php objects
         $data = json_decode(file_get_contents("php://input"));
         
-        //kolla om data är tom, annas skickar den data till propsen i klassen courses
+        //send data to props in class "Courses" if it isn't empty
         if(
             !empty($data->code) &&
             !empty($data->name) &&
             !empty($data->progression) &&
             !empty($data->syllabus)
         ){
-            //skickar in till properies i klassen courses. tar bort tags och specialtecken inför lagring i databas. 
             $courses->code = $data->code;
             $courses->name = $data->name;
             $courses->progression = $data->progression;
             $courses->syllabus = $data->syllabus;
         
-            //kör funktion för att skapa kurs
+            //create course
             if($courses->create()) {
                 http_response_code(201); //created
                 $result = array("message" => "Kursen är skapad");
             } else {
                 http_response_code(503); //Server error
                 $result = array("message" => "Det gick tyvärr inte att skapa kursen");
-            }
+            };
         }
         break;
         //PUT
         case 'PUT':
-            //error om id inte skickas med
+            //error because no id
             if(!isset($id)) {
                 http_response_code(510); //not extended
                 $result = array("message" => "kunde inte uppdatera kursen eftersom inget id skickades med");
-                //om id finns så kör denna
             } else {
                 $data = json_decode(file_get_contents("php://input"));
 
-                //skickar in till properies i klassen courses. tar bort tags och specialtecken inför lagring i databas. 
+                //send data to props in class "Courses"
                 $courses->code = $data->code;
                 $courses->name = $data->name;
                 $courses->progression = $data->progression;
                 $courses->syllabus = $data->syllabus;
 
-                //kör funktion för att uppdatera
+                //update 
                 if($courses->update($id)) {
                     http_response_code(200); //ok
                     $result = array("message" => "kursen är uppdaterad");
@@ -99,13 +97,12 @@ switch($method) {
             }
             break;
             case 'DELETE':
-                //om id inte skickas med
+                //error because no id
                 if(!isset($id)) {
-                    http_response_code(510); //gick ej
+                    http_response_code(510); 
                     $result = array("message" => "kunde inte radera kursen eftersom det inte hittades");
-                    //om id skickas
                 } else {
-                    //kör funktion för att radera rad
+                    //delete course with a specific id
                     if($courses->delete($id)) {
                         http_response_code(200); //ok
                         $result = array("message" => "kursen är raderad");
@@ -118,10 +115,10 @@ switch($method) {
 
 }
 
-//Returnera resultatet som JSON
+//Return result as JSON
 echo json_encode($result);
 
-//stäng databas-kopplingen 
+//close database-connection 
 $db = $database->close();
 
 ?>

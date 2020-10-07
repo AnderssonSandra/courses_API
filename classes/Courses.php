@@ -39,10 +39,10 @@ class Courses {
     function create() {
         $query = "INSERT INTO courses 
         SET 
-        code=:code,
-        name=:name,
-        progression=:progression,
-        syllabus=:syllabus
+        code = :code,
+        name = :name,
+        progression = :progression,
+        syllabus = :syllabus
         ";
 
         //prepare query
