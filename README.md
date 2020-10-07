@@ -22,4 +22,6 @@ Jag har en swish metod som använder olika funktionalitet beroende på vilken me
 "GET": Om det är "GET" så görs en koll om det är ett id medskickat och då anropar den funktionen "getOne" för att hämta 1 kurs. Om inget id är medskickat anropas funktionen "getAll" som hämtar alla kurser. 
 "POST": Om det är "POST" som metod så  görs det först en koll att det finns data medskickat och om det gör det så skickas den data med till funktionen "create" som uppdaterar databasen med den nya kursen. 
 "DELETE": Om det är en "DELETE" metod så görs en koll om ett id har skickat med och då anropas funktionen "delete" och id: på kursen som ska raderas skickas med. Om inget id finns skickas ett felmeddelande tillbaka.
-"PUT": Om det är en "PUT" metod så görs det en koll om ett id är medskicakt och om ett id finns så anropas funktionen "update" och ett id skickas med så att vi vet vilken kurs som ska updateras. om inget id är medskickat skickas ett felmeddelande. 
+"PUT": Om det är en "PUT" metod så görs det en koll om ett id är medskicakt och om ett id finns så anropas funktionen "update" och ett id skickas med så att vi vet vilken kurs som ska updateras. om inget id är medskickat skickas ett felmeddelande.
+
+Allt returneras i JSON format.
